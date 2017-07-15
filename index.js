@@ -2,11 +2,12 @@ import React, { PropTypes } from 'react';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 
 import emoji from './data';
+const ScrollableTabView = require('react-native-scrollable-tab-view');
 
 const EmojiItem = ({ size, item, onPress }) => (
-  <TouchableOpacity style={{ flex: 0, height: size, width: size }} onPress={onPress}>
-    <View style={{ flex: 0, height: size, width: size }}>
-      <Text style={{ flex: 0, fontSize: size / 4 * 3, paddingBottom: 2 }}>
+  <TouchableOpacity style={{ height: size, width: size }} onPress={onPress}>
+    <View style={{ height: size, width: size }}>
+      <Text style={{ fontSize: size / 4 * 3, paddingBottom: 2 }}>
         {item}
       </Text>
     </View>
@@ -14,22 +15,27 @@ const EmojiItem = ({ size, item, onPress }) => (
 );
 
 const EmojiCategory = ({ headerStyle, emojiSize, name, items, onPick }) => (
-  <View style={styles.category}>
+  <ScrollView style={styles.category}>
     <Text style={{ ...styles.categoryName, ...headerStyle }}>{name}</Text>
     <View style={styles.categoryItems}>
       {items.map((em, idx) => (
         <EmojiItem key={idx} size={emojiSize} onPress={() => onPick(em)} item={em} />
       ))}
     </View>
-  </View>
+  </ScrollView>
 );
 
 const EmojiPicker = ({ headerStyle, containerHeight, containerBackgroundColor, emojiSize, onPick }) => (
   <View style={{ ...styles.picker, height: containerHeight, backgroundColor: containerBackgroundColor }}>
-    <ScrollView horizontal={true}>
+    <ScrollableTabView
+      renderTabBar={() => <View />}
+      animated={true}
+      prerenderingSiblingsNumber={1}
+    >
       {emoji.map((category, idx) => (
         <EmojiCategory
           key={idx}
+          tabLabel={idx}
           headerStyle={headerStyle}
           emojiSize={emojiSize}
           name={category.category}
@@ -37,7 +43,7 @@ const EmojiPicker = ({ headerStyle, containerHeight, containerBackgroundColor, e
           onPick={onPick}
         />
       ))}
-    </ScrollView>
+    </ScrollableTabView>
   </View>
 );
 
@@ -62,7 +68,8 @@ const styles = {
     borderTopColor: "#ddd",
   },
   category: {
-    flex: 0,
+    flex: 1,
+    alignSelf: 'stretch',
     paddingHorizontal: 14,
     paddingTop: 2,
   },
@@ -73,8 +80,10 @@ const styles = {
     color: "#888",
   },
   categoryItems: {
-    flex: 1,
+    flexDirection: 'row',
     flexWrap: 'wrap',
+    alignSelf: 'stretch',
+    justifyContent: 'space-between'
   },
 };
 
